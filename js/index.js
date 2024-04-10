@@ -1,19 +1,21 @@
 const apiUrl = "http://127.0.0.1:80/climatempo/";
 
+// Função para realizar um efeito de fade out em um elemento HTML
 function fade(element, callback) {
-    let op = 1;
-    let timer = setInterval(function () {
-        if (op <= 0.1){
-            clearInterval(timer);
-            element.style.display = 'none';
+    let op = 1; // Inicialização da opacidade
+    let timer = setInterval(function () { // Configuração de um intervalo para diminuir gradualmente a opacidade
+        if (op <= 0.1){  // Verificação da opacidade mínima alcançada
+            clearInterval(timer); // Limpeza do intervalo e ocultação do elemento
+            element.style.display = 'none';// Chamada de callback se fornecido
             if (typeof callback === 'function') {
                 callback();
             }
         }
+        // Atualização da opacidade do elemento
         element.style.opacity = op;
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
-        op -= op * 0.1;
-    }, 50);
+        op -= op * 0.1; // Diminuição da opacidade gradualmente
+    }, 50); // Intervalo de atualização
 }
 
 function updateElementText(elementId, text, text2) {
@@ -94,7 +96,7 @@ window.addEventListener("load", async () => {
 
 const pesquisarCampo = document.getElementById("pesquisar");
 
-pesquisarCampo.addEventListener("keyup", async (e) => {
+pesquisarCampo.addEventListener("keyup", async (e) => { //
     if (e.key === 'Enter') {
         const informacoes = await getData(pesquisarCampo.value.toLowerCase());
         displayData(informacoes);

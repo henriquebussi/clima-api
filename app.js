@@ -1,18 +1,19 @@
-const express = require ('express');
-const axios = require ('axios');
-const path = require ('path');
-const cors = require ('cors');
-const config = require ('./config.json');
-const apikey = config.apikey;
+const express = require ('express'); //Express - Um Framework que facilita a criação de servidores web
+const axios = require ('axios');  // Axios - Da Para usar o XMLHttpRequest | XMLHttpRequest - Envia requisições para um servidor web, e depois carrega os dados diretamente para o script
+const path = require ('path');  
+const cors = require ('cors'); // Cors - Faz a ponte do Express para o CORS | CORS - Basicamente Informa que seu Site não é um puta de um virus | https://developer.mozilla.org/pt-BR/docs/Web/HTTP/CORS//
+const config = require ('./config.json'); //pega as configurações do config.json
+const apikey = config.apikey; // declara a API com base na apikey do config.json
 
 const app = express();
 app.listen(80);
+// Tem q ter n tem como
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-function traducaoClima() {
+function traducaoClima() { // Tradução da API de clima
     return {
         "Thunderstorm": "Tempestade",
         "thunderstorm with light rain": "Tempestade",
@@ -85,14 +86,14 @@ function traducaoClima() {
     }
 }
 
-app.get('/climatempo/:cidade', async (req, res) => {
-    const city = req.params.cidade;
+app.get('/climatempo/:cidade', async (req, res) => { // Define uma rota GET no Express, cidade é o paramtro
+    const city = req.params.cidade;  // Pega as informações da cidade
 
-    try{
-        const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric`);
+    try{ // "Tentar", se não der certo, faz alguma outra coisa
+        const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}&units=metric`);  //Faz a Requisição para a Open Weather, usando a Api como "Chave" e usa a Cidade sendo customizada
             
-        if(response.status === 200){
-                const clima = traducaoClima()[response.data.weather[0].description] || response.data.weather[0].description;
+        if(response.status === 200){ //Verifica se esta OK, o Codigo HTTP 200 diz que esta OK
+                const clima = traducaoClima()[response.data.weather[0].description] || response.data.weather[0].description;  //Verifica se tem uma tradução, se tiver a usa, se não tiver usa a descrição padrão
                 const iconUrl = `http://openweathermap.org/img/w/${response.data.weather[0].icon}.png`;
                 
                 const weatherData = {
@@ -103,15 +104,19 @@ app.get('/climatempo/:cidade', async (req, res) => {
                     velocidadeDoVento: response.data.wind.speed,
                     clima: clima,
                     iconUrl: iconUrl
-                };
+                }; // Pega as info utilizando o caminho requerido para cada inf0
 
                 console.log(response.data);
 
-                res.send(weatherData);
+                res.send(weatherData); // 
             } else{
                 res.status(response.status).send({erro: 'Erro ao obter dados meteorologicos'});
+                console.error(error)
+                // Imprime um erro mesmo com a conexão estavel
             }
     } catch (error){
         res.status(500).send({erro: 'Erro ao obter dados meteorologicos', error });
+        console.error(error)
+        // Imprime um erro caso a conexão não seja atendida
     }
 })
